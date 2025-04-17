@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ quiz.title }}</title>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #1e40af;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --highlight: #dbeafe;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            padding: 1.5rem;
+        }
+
+        .container {
+            max-width: 36rem;
+            margin: 0 auto;
+            padding: 2rem;
+            background: var(--card);
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 1.75rem;
+        }
+
+        .timer {
+            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            color: var(--secondary);
+            font-weight: 500;
+            position: sticky;
+            position: sticky;
+                top: 0;
+                right: 0;
+               
+            
+        }
+
+        .question {
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            background: #f1f5f9;
+            border-radius: 0.75rem;
+            transition: transform 0.1s;
+        }
+
+        .question:hover {
+            transform: translateY(-2px);
+        }
+
+        .option {
+            display: block;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition:  0.2s;
+        }
+
+        .option:hover {
+            background: #e2e8f0;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-top: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>{{ quiz.title }}</h1>
+    <div class="timer" id="timer">Time Remaining: <span id="time-display"></span></div>
+    
+
+    <form method="post" action="{% url 'submit_quiz' %}">
+        {% csrf_token %}
+        {% for q in questions %}
+            <div class="question">
+                <p><strong>{{ forloop.counter }}. {{ q.question_text }}</strong></p>
+                <label class="option"><input type="radio" name="{{ q.id }}" value="{{ q.option1 }}" required> {{ q.option1 }}</label>
+                <label class="option"><input type="radio" name="{{ q.id }}" value="{{ q.option2 }}"> {{ q.option2 }}</label>
+                <label class="option"><input type="radio" name="{{ q.id }}" value="{{ q.option3 }}"> {{ q.option3 }}</label>
+                <label class="option"><input type="radio" name="{{ q.id }}" value="{{ q.option4 }}"> {{ q.option4 }}</label>
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn">Submit</button>
+    </form>
+</div>
+
+
+
+
+
+<script>
+    let time = {{ time_limit }} * 60;
+    let tabSwitched = false;
+    let formSubmitted = false; 
+    const display = document.getElementById('time-display');
+      
+      
+    const timer = setInterval(() => {
+        const minutes = Math.floor(time / 60);
+        const seconds = time % 60;
+        display.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        time--;
+        if (time < 0) {
+            clearInterval(timer);
+            alert("Time's up!");
+            document.forms[0].submit();
+        }
+    }, 1000);
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) handleTabSwitch();
+    });
+
+    window.addEventListener('blur', () => {
+        setTimeout(() => {
+            if (!document.hasFocus()) handleTabSwitch();
+        }, 300);
+    });
+    document.forms[0].addEventListener('submit', () => {
+        formSubmitted = true;
+    });
+    function handleTabSwitch() {
+        if (!tabSwitched && !formSubmitted) {
+            tabSwitched = true;
+            const disqualifiedInput = document.createElement('input');
+            disqualifiedInput.type = 'hidden';
+            disqualifiedInput.name = 'disqualified';
+            disqualifiedInput.value = '1';
+            document.forms[0].appendChild(disqualifiedInput);
+
+            alert("Tab switching is not allowed. You have been disqualified.");
+            document.forms[0].submit();
+        }
+    }
+</script>
+
+
+</body>
+</html>

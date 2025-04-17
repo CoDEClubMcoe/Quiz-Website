@@ -1,0 +1,28 @@
+# Django-specific
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+db.sqlite3
+media/
+staticfiles/
+
+# Environment
+.env
+.venv/
+env/
+venv/
+ENV/
+*.env
+
+# VSCode
+.vscode/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Migrations 
+# */migrations/*.py
+# */migrations/__pycache__/

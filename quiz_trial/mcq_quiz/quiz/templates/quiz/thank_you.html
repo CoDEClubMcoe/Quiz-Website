@@ -1,0 +1,106 @@
+<!-- templates/quiz/thank_you.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Thank You!</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #f1f1f1;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        h1, p {
+            overflow: hidden;
+            border-right: .15em solid #f1f1f1;
+            white-space: nowrap;
+            margin: 0 auto;
+            letter-spacing: .05em;
+            animation: none;
+        }
+
+        .download-button {
+            margin-top: 30px;
+            padding: 25px;
+            font-weight: bold;
+            background-color:#3b82f6;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: none; 
+        }
+
+        .download-button:hover {
+            background-color: #1e40af;
+            transform: scale(1.05);
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink {
+            50% { border-color: transparent }
+        }
+    </style>
+</head>
+<body>
+    <h1 id="animated-h1"></h1>
+    <h2 id="animated-p"></h2>
+
+    <a href="{% url 'download_certificate' %}" id="download-btn" class="download-button">
+        Download Certificate
+    </a>
+
+    <script>
+        const name = `{{ name }}`;
+        const score = `{{ score }}`;
+        const h1Text = `Congratulations on completing your quiz, ${name}!!!🎉🎉🎉🎉🎉`;
+        const pText = `You scored ${score}  points !!!!`;
+
+        const h1El = document.getElementById("animated-h1");
+        const pEl = document.getElementById("animated-p");
+        const button = document.getElementById("download-btn");
+
+        let h1Index = 0;
+        let pIndex = 0;
+
+        function typeText(element, text, delay, callback) {
+            const interval = setInterval(() => {
+                element.textContent += text[callback.index++];
+                if (callback.index === text.length) {
+                    clearInterval(interval);
+                    if (callback.next) callback.next();
+                }
+            }, delay);
+        }
+
+        
+        typeText(h1El, h1Text, 40, {
+            index: 0,
+            next: () => {
+                typeText(pEl, pText, 40, {
+                    index: 0,
+                    next: () => {
+                        button.style.display = 'inline-block';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
